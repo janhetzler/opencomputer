@@ -19,15 +19,19 @@ jobs:
 
           output_file = "repository_flattened.txt"
           ignored_files = {"uv.lock", output_file}
+          ignored_exts = {".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".tar", ".gz", ".exe", ".whl"}
 
           with open(output_file, "w", encoding="utf-8", errors="ignore") as out:
               out.write("================================================================\n")
-              out.write("Repository Inhalt (Vollständig ohne Filter)\n")
+              out.write("Repository Inhalt (Nur Sourcecode & Konfiguration)\n")
               out.write("================================================================\n\n")
 
               for root, dirs, files in os.walk("."):
+                  # Versteckte Ordner (.git, .github etc.) überspringen
+                  dirs[:] = [d for d in dirs if not d.startswith(".")]
+
                   for file in files:
-                      if file in ignored_files:
+                      if file in ignored_files or any(file.endswith(ext) for ext in ignored_exts):
                           continue
                       
                       file_path = os.path.join(root, file)
