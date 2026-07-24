@@ -1,7 +1,7 @@
 # JOURNAL.md -- Entwicklungstagebuch opencomputer
 
 Fork von: open-webui/computer
-Zweck: GUI + API Gateway fuer den Local Agent Stack (janhetzler/la)
+Zweck: GUI + API Gateway fuer den Local Agent Stack (la)
 
 Neuester Eintrag oben.
 
@@ -11,18 +11,18 @@ Neuester Eintrag oben.
 
 ### Kontext
 
-`janhetzler/opencomputer` ist ein Fork von `open-webui/computer` (cptr).
-Es wird als GUI und API-Gateway fuer den Local Agent Stack eingesetzt.
+Dieser Fork von `open-webui/computer` (cptr) wird als GUI und
+API-Gateway fuer den Local Agent Stack eingesetzt.
 
 ### Warum opencomputer
 
-- FastAPI + Python -- gleiche Technologie wie janhetzler/la
+- FastAPI + Python -- gleiche Technologie wie der LA Stack
 - Vollstaendig automatisierbar via REST API
 - MCP (Stdio + HTTP) nativ unterstuetzt
 - Eingebauter /v1 API-Gateway ersetzt LiteLLM
 - Terminal, Git, Dateiverwaltung direkt im Browser
 
-### Geplante Integration mit janhetzler/la
+### Geplante Integration mit dem LA Stack
 
 1. Agent Server :8002 als OpenAPI Tool-Server in opencomputer
 2. MCP-Server (git, fetch) als mcp_stdio Tool-Server
@@ -32,11 +32,10 @@ Es wird als GUI und API-Gateway fuer den Local Agent Stack eingesetzt.
 ### Aktueller Stand
 
 - Fork erstellt: 2026-07-24
-- HuggingFace Space: https://janhetzler-opencomputer.hf.space
 - Granite-Tiny (4B) laeuft bereits mit --jinja + Tool-Calling bewiesen
 - Naechster Schritt: LA Stack Integration
 
 ### Verwandte Repos
 
-- `janhetzler/la` -- Agent Stack
+- LA Stack Repository -- Agent Stack
 - `open-webui/computer` -- Original-Projekt
