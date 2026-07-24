@@ -18,8 +18,9 @@ jobs:
           import os
 
           output_file = "repository_flattened.txt"
-          ignored_dirs = {".git", "node_modules", "venv", ".idea", ".vscode", "__pycache__"}
-          ignored_exts = {".png", ".jpg", ".jpeg", ".gif", ".zip", ".tar", ".gz", ".pdf", ".ico", ".exe"}
+          ignored_dirs = {".git", "node_modules", "venv", ".idea", ".vscode", "__pycache__", ".venv", ".cptr", ".svelte-kit", "dist", "build"}
+          ignored_files = {"uv.lock", output_file}
+          ignored_exts = {".png", ".jpg", ".jpeg", ".gif", ".zip", ".tar", ".gz", ".pdf", ".ico", ".exe", ".lock"}
 
           with open(output_file, "w", encoding="utf-8", errors="ignore") as out:
               out.write("================================================================\n")
@@ -27,11 +28,11 @@ jobs:
               out.write("================================================================\n\n")
 
               for root, dirs, files in os.walk("."):
-                  # Ignorierte Ordner überspringen
-                  dirs[:] = [d for d in dirs if d not in ignored_dirs]
+                  # Ignorierte Ordner überspringen (in-place modification von dirs)
+                  dirs[:] = [d for d in dirs if d not in ignored_dirs and not d.startswith("cptr/frontend/node_modules")]
                   
                   for file in files:
-                      if file == output_file or any(file.endswith(ext) for ext in ignored_exts):
+                      if file in ignored_files or any(file.endswith(ext) for ext in ignored_exts):
                           continue
                       
                       file_path = os.path.join(root, file)
