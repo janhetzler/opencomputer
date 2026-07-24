@@ -1,9 +1,9 @@
 name: Repository Flattener
 
 on:
-  workflow_dispatch: # Erlaubt das manuelle Ausführen im GitHub-Tab "Actions"
+  workflow_dispatch:
   push:
-    branches: [ main, master ] # Automatisch bei Push ausführen
+    branches: [ main, master ]
 
 jobs:
   flatten:
@@ -18,19 +18,32 @@ jobs:
           import os
 
           output_file = "repository_flattened.txt"
-          ignored_dirs = {".git", "node_modules", "venv", ".idea", ".vscode", "__pycache__", ".venv", ".cptr", ".svelte-kit", "dist", "build"}
+          
+          # Ordner, die komplett ignoriert werden sollen
+          ignored_dirs = {
+              ".git", ".github", "node_modules", "venv", ".venv", 
+              ".idea", ".vscode", "__pycache__", ".cptr", 
+              ".svelte-kit", "dist", "build", "target"
+          }
+          
+          # Dateinamen, die ignoriert werden
           ignored_files = {"uv.lock", output_file}
-          ignored_exts = {".png", ".jpg", ".jpeg", ".gif", ".zip", ".tar", ".gz", ".pdf", ".ico", ".exe", ".lock"}
+          
+          # Dateiendungen, die ignoriert werden (Binärdateien, Archive etc.)
+          ignored_exts = {
+              ".png", ".jpg", ".jpeg", ".gif", ".zip", ".tar", 
+              ".gz", ".pdf", ".ico", ".exe", ".lock", ".pyc", ".whl"
+          }
 
           with open(output_file, "w", encoding="utf-8", errors="ignore") as out:
               out.write("================================================================\n")
-              out.write("Repository Inhalt\n")
+              out.write("Repository Inhalt (Vollständig inkl. Unterordner)\n")
               out.write("================================================================\n\n")
 
               for root, dirs, files in os.walk("."):
-                  # Ignorierte Ordner überspringen (in-place modification von dirs)
-                  dirs[:] = [d for d in dirs if d not in ignored_dirs and not d.startswith("cptr/frontend/node_modules")]
-                  
+                  # Ignorierte Ordner aus der Suche ausschließen
+                  dirs[:] = [d for d in dirs if d not in ignored_dirs and not d.startswith(".")]
+
                   for file in files:
                       if file in ignored_files or any(file.endswith(ext) for ext in ignored_exts):
                           continue
