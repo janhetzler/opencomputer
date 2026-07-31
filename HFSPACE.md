@@ -6,6 +6,38 @@ Neuester Eintrag oben.
 
 ---
 
+## Logs, Traces und Testergebnisse -- wo landet was
+
+### Laufzeit (ephemer -- nur waehrend Container laeuft)
+
+| Pfad | Inhalt |
+|------|--------|
+| `/tmp/logs/` | llama-server, LiteLLM, Phoenix, Agent Server Logs |
+| `/tmp/chroma_la/` | ChromaDB Daten |
+| `/tmp/traces/` | Phoenix Trace Reports (JSON) |
+| `/tmp/test_results_hfspace.json` | Letzter Testlauf Rohdaten |
+
+Diese Dateien sind ephemer -- verschwinden beim Container-Stop.
+Relevante Ergebnisse muessen ins Repo gepusht werden.
+
+### Repo (persistent -- bleibt erhalten)
+
+| Datei | Inhalt |
+|-------|--------|
+| `docs/HFSPACE_TESTRESULTS.md` | Alle Testlaeufe mit Ergebnissen und Traces |
+| `docs/traces/` | Detaillierte Phoenix Trace Reports pro Testlauf |
+| `BUGS.md` | Fehlerprotokoll |
+| `JOURNAL.md` | Entwicklungstagebuch |
+
+### Ablage-Regel
+
+Nach jedem Testlauf:
+1. Testergebnisse in `docs/HFSPACE_TESTRESULTS.md` ergaenzen
+2. Phoenix Trace Report nach `docs/traces/YYYY-MM-DD_testlauf.json` pushen
+3. JOURNAL.md Eintrag wenn etwas Neues passiert ist
+
+---
+
 ## Dateiuebersicht -- Was liegt wo, was tut was
 
 Alle relevanten Dateien fuer den HF Space Betrieb auf einen Blick.
