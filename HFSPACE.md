@@ -42,6 +42,15 @@ Zwei unabhaengige Stacks laufen parallel im selben Container:
 Alle Ports sind getrennt -- kein Konflikt zwischen Stack 1 und Stack 2.
 Zwei llama-server-Instanzen im selben Container sind kein Problem.
 
+HF Space DNS-Routing: Jeder per EXPOSE freigegebene Port ist direkt
+im Browser erreichbar -- z.B.:
+- janhetzler-opencomputer-7860.hf.space  (cptr)
+- janhetzler-opencomputer-6006.hf.space  (Phoenix)
+- janhetzler-opencomputer-4000.hf.space  (LiteLLM)
+
+Dockerfile EXPOSE muss entsprechend erweitert werden:
+EXPOSE 7860 8080 8090 8081 4000 6006 8002
+
 ### Auth-Loesung
 
 Problem: cptr generiert beim Start einen zufaelligen Token -- manuelles
@@ -54,6 +63,6 @@ Loesung: Fester CPTR_STARTUP_TOKEN im Dockerfile (z.B. "la").
 
 ### Naechste Schritte
 
-1. Dockerfile anpassen: CPTR_STARTUP_TOKEN setzen
+1. Dockerfile anpassen: CPTR_STARTUP_TOKEN setzen + EXPOSE erweitern
 2. LA Stack Installations-Skript fuer HF Space erstellen
 3. Testen: Stack 2 parallel zu Stack 1 installieren und starten
