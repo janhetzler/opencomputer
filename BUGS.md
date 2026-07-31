@@ -33,6 +33,37 @@ der Stack manuell laeuft.
 
 
 
+
+## BUG-005: Granite-Tiny startet parallel zu LA Stack -- RAM-Engpass
+
+**Status:** Offen
+**Umgebung:** HF Space Docker (16GB RAM real)
+
+**Symptom:** Beide llama-server (Granite-Tiny :8080 + Granite-350m :8090)
+starten gleichzeitig -- LiteLLM bekommt nicht genug RAM und faehrt nicht hoch.
+
+**Fix:** In start.sh Granite-Tiny llama-server ans Ende verschieben --
+nach start_hfspace.py, vor wait.
+
+**Zustaendig:** Dockerfile in opencomputer Repo anpassen.
+
+---
+
+## BUG-006: LiteLLM Timeout zu kurz fuer HF Space
+
+**Status:** Offen
+**Umgebung:** HF Space
+
+**Symptom:** LiteLLM Readiness-Check in start_hfspace.py
+laeuft nach 40 Sekunden ab -- LiteLLM braucht auf HF Space
+laenger zum Starten.
+
+**Fix:** Timeout in start_hfspace.py von 40 auf 90 Sekunden erhoehen.
+
+**Zustaendig:** scripts/hfspace/start_hfspace.py in opencomputer Repo.
+
+---
+
 ## BUG-003: prisma fehlt in requirements.txt (LA)
 
 **Status:** Offen
