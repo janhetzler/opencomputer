@@ -3,7 +3,7 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     curl python3 python3-pip libmagic1 git git-lfs wget unzip \
-    software-properties-common npm tini \
+    software-properties-common npm tini netcat-openbsd \
     python3.11 python3.11-venv && \
     update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 && \
     rm -rf /var/lib/apt/lists/*
