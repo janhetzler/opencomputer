@@ -7,6 +7,17 @@ Neuester Eintrag oben.
 
 ---
 
+## 2026-07-31 -- Phoenix Tracing + Ein-Befehl-Skript
+
+- 4x 6/6 Testlaeufe bestaetigt
+- Phoenix Tracing: 73 Spans ausgelesen, alle OK
+- save_note und search_local_documents korrekt getracet
+- start_hfspace.py integriert inspect_phoenix inline --
+  ein Befehl, ein Terminal, alles automatisch (c796f94)
+- HFSPACE_TESTRESULTS.md aktualisiert mit vollstaendigem Trace-Report
+
+---
+
 ## 2026-07-31 -- LA Stack auf HF Space: 2x 6/6 OK
 
 Stack 2 (LA mit Granite-350m) laeuft parallel zu Stack 1
