@@ -6,6 +6,26 @@ Neuester Eintrag oben.
 
 ---
 
+## cptr Login
+
+Standard-Credentials fuer den HF Space:
+- Username: user
+- Passwort: 12345678
+
+Login via REST API mit Cookie-Speicherung:
+
+```bash
+curl -s -X POST http://localhost:7860/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"user","password":"12345678"}' \
+  -c /tmp/cptr_cookies.txt
+```
+
+Cookie liegt danach unter /tmp/cptr_cookies.txt und kann fuer
+weitere API-Aufrufe verwendet werden: `-b /tmp/cptr_cookies.txt`
+
+---
+
 ## Logs, Traces und Testergebnisse -- wo landet was
 
 ### Laufzeit (ephemer -- nur waehrend Container laeuft)
