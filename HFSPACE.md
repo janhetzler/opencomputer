@@ -6,6 +6,48 @@ Neuester Eintrag oben.
 
 ---
 
+## Dateiuebersicht -- Was liegt wo, was tut was
+
+Alle relevanten Dateien fuer den HF Space Betrieb auf einen Blick.
+Hier nachschauen wenn etwas geaendert werden muss.
+
+### Dockerfile (Root)
+**Zweck:** Image-Build -- definiert was zur Build-Zeit passiert.
+**Aendern wenn:** neue Pakete, neues Modell, neue ENV-Variable,
+EXPOSE-Ports aendern, start.sh anpassen.
+
+### /usr/local/bin/start.sh (wird im Dockerfile inline definiert)
+**Zweck:** Laufzeit-Startskript -- wird bei jedem Container-Start ausgefuehrt.
+**Aendern wenn:** Stack-1 oder Stack-2 Startparameter aendern,
+neue Komponente hinzufuegen, Reihenfolge aendern.
+**Achtung:** Liegt nicht als eigene Datei im Repo -- ist inline im Dockerfile.
+
+### scripts/hfspace/start_hfspace.py
+**Zweck:** Stack-2-Start (LA Agent Stack) + 6-Agenten-Testlauf +
+Phoenix Trace inline. Wird von start.sh aufgerufen.
+**Aendern wenn:** Ports aendern, neue Agenten, Testlauf anpassen,
+inspect-Logik aendern, ENV-Variablen ergaenzen.
+**Umgebungsvariablen:** LA_REPO, LLAMA_SERVER_BIN, MODEL_PATH,
+EMBED_MODEL_PATH, LLAMA_PORT, EMBED_PORT, CHROMA_PATH, LITELLM_KEY
+
+### scripts/hfspace/inspect_phoenix_hfspace.py
+**Zweck:** Separates Diagnose-Skript -- Phoenix Traces manuell auslesen
+ohne vollen Testlauf. Fuer gezielte Diagnose im Terminal.
+**Aendern wenn:** Trace-Format aendern, andere Ports, andere Ausgabepfade.
+**Hinweis:** Setzt laufenden Stack voraus -- Pre-Flight-Check prueft das.
+
+### docs/HFSPACE_TESTRESULTS.md
+**Zweck:** Testergebnisse aller HF Space Testlaeufe.
+**Aendern wenn:** Nach jedem Testlauf -- wird von start_hfspace.py
+automatisch aktualisiert (Push via GH_TOKEN) oder manuell ergaenzt.
+
+### HFSPACE.md (dieses Dokument)
+**Zweck:** Konzept, Plan, Dateiuebersicht, Entscheidungen.
+**Aendern wenn:** Neue Erkenntnisse, Planänderungen, Phase-2-Schritte
+abgehakt werden.
+
+---
+
 ## 2026-07-31 -- Produktionsreifer Dockerfile-Plan
 
 ### Was heute im Hottest validiert wurde
