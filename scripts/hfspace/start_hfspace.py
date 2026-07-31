@@ -40,10 +40,12 @@ AGENT_URL        = "http://127.0.0.1:8002/v1/chat/completions"
 LOG_DIR          = "/tmp/logs"
 AUTH             = f"Bearer {LITELLM_KEY}"
 
+LA_REPO = os.getenv("LA_REPO", "/home/varxdev/la")
 os.makedirs(CHROMA_PATH, exist_ok=True)
 os.makedirs(LOG_DIR, exist_ok=True)
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../agents/server"))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../agents/ingestion"))
+sys.path.insert(0, LA_REPO)
+sys.path.insert(0, os.path.join(LA_REPO, "agents", "server"))
+sys.path.insert(0, os.path.join(LA_REPO, "agents", "ingestion"))
 
 # Pre-Flight Checks
 print("=== PRE-FLIGHT CHECKS ===", flush=True)
