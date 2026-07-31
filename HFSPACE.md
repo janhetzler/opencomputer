@@ -61,8 +61,26 @@ Loesung: Fester CPTR_STARTUP_TOKEN im Dockerfile (z.B. "la").
 - Einmalig eingeben beim ersten Start der Session
 - Kein Suchen in Logs
 
+### Automatische cptr-Konfiguration via REST API
+
+Problem: Nach jedem Neustart muss die Verbindung zu llama-server
+manuell im Setup-Dialog eingegeben werden (Base-URL, API-Key, Modell).
+
+Loesung: Ein Setup-Skript das automatisch nach dem cptr-Start laeuft
+und die Konfiguration per REST API eintraegt.
+
+- Endpunkt: chat.connections via cptr Admin REST API
+- Base-URL: http://127.0.0.1:8080/v1
+- API-Key: local
+- Das Skript wird Teil von start.sh im Dockerfile
+- Ablauf: cptr starten -> warten bis API bereit -> Verbindung per REST API setzen
+
+Vorteil: cptr ist sofort nach dem Start betriebsbereit -- kein manueller
+Setup-Dialog, keine Konfiguration von Hand.
+
 ### Naechste Schritte
 
 1. Dockerfile anpassen: CPTR_STARTUP_TOKEN setzen + EXPOSE erweitern
-2. LA Stack Installations-Skript fuer HF Space erstellen
-3. Testen: Stack 2 parallel zu Stack 1 installieren und starten
+2. Setup-Skript implementieren: cptr REST API Verbindungskonfiguration
+3. LA Stack Installations-Skript fuer HF Space erstellen
+4. Testen: Stack 2 parallel zu Stack 1 installieren und starten
