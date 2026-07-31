@@ -32,6 +32,43 @@ der Stack manuell laeuft.
 ---
 
 
+
+## BUG-003: prisma fehlt in requirements.txt (LA)
+
+**Status:** Offen
+**Umgebung:** HF Space (la_env)
+
+**Symptom:** LiteLLM wirft ModuleNotFoundError: No module named 'prisma'
+beim ersten Request — Internal server error die Folge.
+
+**Workaround:** pip install prisma
+
+**Fix:** prisma in janhetzler/la requirements.txt ergaenzen.
+Zustaendig: Developer-Chat im LA Projekt.
+
+**Entdeckt:** 2026-07-31 im HF Space Deployment.
+
+---
+
+## BUG-004: Phoenix stirbt nach Stack-Neustart
+
+**Status:** Offen
+**Umgebung:** HF Space
+
+**Symptom:** Nach manuellem pkill + Neustart laeuft Phoenix nicht
+mehr zuverlaessig. Traces koennen nicht exportiert werden
+(Connection refused :6006).
+
+**Ursache:** Phoenix wird nicht sauber neu gestartet wenn
+vorherige Instanz noch Sockets haelt.
+
+**Fix:** Readiness-Check in start_hfspace.py fuer Phoenix
+verlaengern + Port-Check vor Start.
+
+**Entdeckt:** 2026-07-31 im HF Space Deployment.
+
+---
+
 ## BUG-002: async_timeout fehlt in requirements.txt (LA)
 
 **Status:** Offen
