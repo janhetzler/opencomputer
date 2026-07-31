@@ -1,71 +1,55 @@
-# ── Stage 1: Build the SvelteKit frontend ──────────────────
-FROM --platform=$BUILDPLATFORM node:22-slim AS frontend-builder
+FROM ubuntu:22.04
 
-WORKDIR /build/frontend
-COPY cptr/frontend/package.json cptr/frontend/package-lock.json ./
-RUN npm ci
-COPY cptr/frontend/ ./
-RUN npm run build
-
-
-# ── Stage 2: Install Python dependencies & build wheel ─────
-FROM --platform=$BUILDPLATFORM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS backend-builder
-
-WORKDIR /build
-COPY pyproject.toml uv.lock LICENSE README.md CHANGELOG.md ./
-COPY cptr/ cptr/
-
-# Drop the pre-built frontend into the package tree
-COPY --from=frontend-builder /build/frontend/build cptr/frontend/build
-
-# Build the wheel (includes frontend build as an artifact via hatch)
-RUN uv build --wheel --out-dir /dist
-
-
-# ── Stage 3: Shared runtime ────────────────────────────────
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS runtime
-
-LABEL org.opencontainers.image.source="https://github.com/open-webui/computer"
-LABEL org.opencontainers.image.description="Open WebUI Computer"
-
-# Runtime deps shared by default and browser images.
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends gh git tini && \
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+    curl python3 python3-pip libmagic1 git git-lfs wget unzip \
+    software-properties-common npm \
+    python3.11 python3.11-venv && \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 && \
     rm -rf /var/lib/apt/lists/*
 
-# Create non-root user and writable data directory
-RUN useradd --create-home --shell /bin/bash cptr && \
-    mkdir -p /data && \
-    chown -R cptr:cptr /data
-USER cptr
-WORKDIR /home/cptr
+# cptr (Open WebUI Computer) installieren
+RUN pip3 install --no-cache-dir 'cptr[all]'
 
-# Install the wheel into an isolated venv
-COPY --chown=cptr:cptr --from=backend-builder /dist/*.whl /tmp/
-RUN uv venv /home/cptr/.venv && \
-    set -- /tmp/*.whl && \
-    uv pip install --python /home/cptr/.venv/bin/python "$1[all]" && \
-    rm /tmp/*.whl
+# Llama-Engine installieren
+RUN curl -L https://github.com/ggml-org/llama.cpp/releases/download/b9895/llama-b9895-bin-ubuntu-x64.tar.gz \
+    -o /tmp/llama.tar.gz && mkdir -p /opt/llama && \
+    tar -xzf /tmp/llama.tar.gz -C /opt/llama --strip-components=1 && \
+    chmod +x /opt/llama/llama-server && rm /tmp/llama.tar.gz
 
-ENV PATH="/home/cptr/.venv/bin:$PATH"
-ENV CPTR_DATA_DIR="/data"
+# Modell (granite-4.0-h-tiny-UD-Q4_K_XL.gguf) herunterladen
+RUN mkdir -p /data/models && curl -L \
+    "https://huggingface.co/unsloth/granite-4.0-h-tiny-GGUF/resolve/main/granite-4.0-h-tiny-UD-Q4_K_XL.gguf" \
+    -o /data/models/granite-4.0-h-tiny-UD-Q4_K_XL.gguf
 
-EXPOSE 8000
-VOLUME ["/data"]
+# Benutzer und Arbeitsverzeichnis einrichten
+RUN useradd -m -u 1000 varxdev && \
+    mkdir -p /home/varxdev/workspace && \
+    chown -R varxdev:varxdev /home/varxdev /data
 
-ENTRYPOINT ["tini", "--"]
-CMD ["cptr", "run", "--host", "0.0.0.0", "--port", "8000", "--headless"]
+# Start-Skript fuer cptr + Llama
+RUN cat > /usr/local/bin/start.sh <<'SH'
+#!/bin/sh
 
+# Llama-Server intern auf Port 8080 mit 2 Threads und --jinja Flag starten
+/opt/llama/llama-server \
+  --model /data/models/granite-4.0-h-tiny-UD-Q4_K_XL.gguf \
+  --host 127.0.0.1 \
+  --port 8080 \
+  --ctx-size 8192 \
+  --threads 2 \
+  --jinja \
+  -ngl 0 &
 
-# ── Browser image: Chromium for agent browser automation ───
-FROM runtime AS browser
+# cptr auf Port 7860 fuer HF Spaces starten
+cptr run --host 0.0.0.0 --port 7860 &
 
-USER root
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends chromium && \
-    rm -rf /var/lib/apt/lists/*
-USER cptr
+wait
+SH
+RUN chmod +x /usr/local/bin/start.sh
 
+USER varxdev
+WORKDIR /home/varxdev/workspace
 
-# ── Default image ──────────────────────────────────────────
-FROM runtime AS default
+EXPOSE 7860 8080
+CMD ["/usr/local/bin/start.sh"]
