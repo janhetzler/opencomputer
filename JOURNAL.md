@@ -18,6 +18,10 @@ Neuester Eintrag oben.
 - **janhetzler/la requirements.txt:** prisma ergaenzen (async_timeout bereits vorhanden)
 - **Dockerfile Reihenfolge:** cptr zuerst installieren, dann LA requirements.txt --
   cptr zieht viele Abhaengigkeiten mit die LiteLLM benoetigt (inkl. prisma moeglicherweise)
+- **tini als PID 1 im Dockerfile:** tini verhindert Zombie-Prozesse automatisch.
+  Ursache: Python/Uvicorn als PID 1 raeumen verwaiste Kindprozesse nicht auf.
+  Fix: apt-get install -y tini + ENTRYPOINT ["/usr/bin/tini", "--"]
+  Quelle: Open WebUI Entwicklerangaben, verifiziertes Problem mit Subprozessen.
   (fehlen im Docker Build, wurden beim manuellen Test automatisch
   als Abhaengigkeit von LiteLLM installiert).
 
