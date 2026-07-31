@@ -42,6 +42,13 @@ API-Gateway fuer den Local Agent Stack eingesetzt.
 - Granite-Tiny (4B) laeuft bereits mit --jinja + Tool-Calling bewiesen
 - Naechster Schritt: LA Stack Integration
 
+### Ideen / Phase 2
+
+- Eigenes cptr-Wheel aus dem Fork bauen und ueber GitHub Releases
+  bereitstellen (analog PyPI, aber im eigenen Repo). Beschleunigt
+  Docker-Builds gegenueber direkter Git-Installation. Paketname
+  muss von "cptr" abweichen (z.B. cptr-la), da PyPI-Name belegt.
+
 ### Verwandte Repos
 
 - LA Stack Repository -- Agent Stack
