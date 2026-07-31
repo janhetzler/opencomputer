@@ -54,17 +54,16 @@ WORKDIR /home/varxdev/workspace
 RUN cat > /home/varxdev/start.sh <<'SH'
 #!/bin/sh
 
-# Stack 2: LA Agent Stack zuerst -- llama-server :8090 + LiteLLM brauchen RAM
+# 1. llama-server :8090 starten und warten
 /opt/llama/llama-server \
   --model /data/models/granite-350m-Q4_K_M.gguf \
   --host 127.0.0.1 --port 8090 \
   --ctx-size 32768 --threads 4 --parallel 1 \
   --jinja --log-disable &
 
-# Warten bis llama-server :8090 bereit (Port offen)
 while ! nc -z localhost 8090; do sleep 0.5; done
 
-# Embedding-Server
+# 2. Embedding-Server :8081 starten und warten
 /opt/llama/llama-server \
   --model /data/models/granite-embedding-30m-Q4_0.gguf \
   --host 127.0.0.1 --port 8081 \
@@ -72,14 +71,8 @@ while ! nc -z localhost 8090; do sleep 0.5; done
 
 while ! nc -z localhost 8081; do sleep 0.5; done
 
-# LiteLLM -- erst wenn beide llama-server bereit sind
+# 3. start_hfspace.py uebernimmt LiteLLM, Phoenix, Agent Server, Tests
 . /home/varxdev/la_env/bin/activate
-litellm --config /home/varxdev/la/docker/litellm_config.yaml \
-  --host 127.0.0.1 --port 4000 &
-
-while ! nc -z localhost 4000; do sleep 0.5; done
-
-# LA Agent Stack + cptr parallel
 curl -sL "https://raw.githubusercontent.com/janhetzler/opencomputer/main/scripts/hfspace/start_hfspace.py" \
   -o /tmp/start_hfspace.py
 LA_REPO=/home/varxdev/la \
@@ -88,9 +81,10 @@ EMBED_MODEL_PATH=/data/models/granite-embedding-30m-Q4_0.gguf \
 LLAMA_SERVER_BIN=/opt/llama/llama-server \
 python3 /tmp/start_hfspace.py &
 
+# 4. cptr parallel
 cptr run --host 0.0.0.0 --port 7860 &
 
-# Granite-Tiny zuletzt -- cptr braucht es nicht automatisch
+# 5. Granite-Tiny zuletzt
 /opt/llama/llama-server \
   --model /data/models/granite-4.0-h-tiny-UD-Q4_K_XL.gguf \
   --host 127.0.0.1 --port 8080 \
