@@ -50,6 +50,9 @@ RUN cp -r /home/la_build /home/varxdev/la && \
 # Berechtigungen setzen -- nach allen Kopier-Operationen
 RUN chown -R varxdev:varxdev /home/varxdev /data /tmp/logs /tmp/chroma_la /tmp/traces
 
+USER varxdev
+WORKDIR /home/varxdev/workspace
+
 # Start-Skript fuer cptr + Llama + LA Stack
 RUN cat > /usr/local/bin/start.sh <<'SH'
 #!/bin/sh
@@ -80,9 +83,6 @@ python3 /tmp/start_hfspace.py &
 wait
 SH
 RUN chmod +x /usr/local/bin/start.sh
-
-USER varxdev
-WORKDIR /home/varxdev/workspace
 
 EXPOSE 7860 8080 8090 8081 4000 6006 8002
 CMD ["/usr/local/bin/start.sh"]
