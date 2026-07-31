@@ -65,3 +65,98 @@ Stack 2 (LA) laeuft parallel zu Stack 1 (cptr + Granite-Tiny).
 - inspect_phoenix.py fuer HF Space anpassen (LLAMA_SERVER_BIN ENV)
 - Automatischen Stack-Start ins Dockerfile integrieren
 - CPTR_STARTUP_TOKEN im Dockerfile setzen
+
+
+---
+
+# HF Space Trace Report -- 2026-07-31_18-25
+
+**Tests:** 6/6 OK
+
+## Testergebnisse
+
+- OK **Supervisor Routing**: OK (65 Zeichen) | 7.5s | HTTP 200
+- OK **Comms Agent**: OK (492 Zeichen) | 11.2s | HTTP 200
+- OK **Code Agent**: OK (293 Zeichen) | 3.8s | HTTP 200
+- OK **Researcher Agent**: OK (42 Zeichen) | 25.4s | HTTP 200
+- OK **Notes Agent**: OK (58 Zeichen) | 15.3s | HTTP 200
+- OK **Handoff Agent**: OK (655 Zeichen) | 7.1s | HTTP 200
+
+## Phoenix Spans
+
+```
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  save_note | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  search_local_documents | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  search_local_documents | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  search_local_documents | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  search_local_documents | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  search_local_documents | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  save_note | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  search_local_documents | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  save_note | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  search_local_documents | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  search_local_documents | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  search_local_documents | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  search_local_documents | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  search_local_documents | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+  ChatOpenAI | OK | ?ms
+
+```
