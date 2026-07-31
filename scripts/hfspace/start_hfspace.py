@@ -207,6 +207,30 @@ for i in range(30):
 
 # 5. Agent Config + Phoenix Init
 print("\n=== KONFIGURIERE AGENT SERVER ===", flush=True)
+
+# mcp.json zur Laufzeit generieren -- LA_REPO statt hardkodiertem /home/claude/la
+MCP_JSON_PATH = "/tmp/mcp_hfspace.json"
+mcp_config = {
+    "mcpServers": {
+        "git": {
+            "command": "python3",
+            "args": ["-m", "mcp_server_git", "--repository", LA_REPO],
+            "transport": "stdio",
+            "description": "Git Repository Tools"
+        },
+        "fetch": {
+            "command": "python3",
+            "args": ["-m", "mcp_server_fetch"],
+            "transport": "stdio",
+            "description": "Web Content Fetching"
+        }
+    }
+}
+with open(MCP_JSON_PATH, "w") as f:
+    json.dump(mcp_config, f, indent=2)
+os.environ["MCP_CONFIG_PATH"] = MCP_JSON_PATH
+print(f"mcp.json generiert: {MCP_JSON_PATH} (repo: {LA_REPO})", flush=True)
+
 import config
 config.LITELLM_URL = "http://127.0.0.1:4000"
 config.LITELLM_KEY = LITELLM_KEY
