@@ -15,7 +15,9 @@ Neuester Eintrag oben.
 
 - **start_hfspace.py:** LiteLLM Timeout von 40 auf 90 Sekunden erhoehen.
 
-- **janhetzler/la requirements.txt:** async_timeout und prisma ergaenzen
+- **janhetzler/la requirements.txt:** prisma ergaenzen (async_timeout bereits vorhanden)
+- **Dockerfile Reihenfolge:** cptr zuerst installieren, dann LA requirements.txt --
+  cptr zieht viele Abhaengigkeiten mit die LiteLLM benoetigt (inkl. prisma moeglicherweise)
   (fehlen im Docker Build, wurden beim manuellen Test automatisch
   als Abhaengigkeit von LiteLLM installiert).
 
