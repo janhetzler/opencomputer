@@ -53,24 +53,16 @@ RUN chown -R varxdev:varxdev /home/varxdev /data /tmp/logs /tmp/chroma_la /tmp/t
 USER varxdev
 WORKDIR /home/varxdev/workspace
 
-# Start-Skript fuer cptr + Llama + LA Stack
-RUN cat > /usr/local/bin/start.sh <<'SH'
+RUN cat > /home/varxdev/start.sh <<'SH'
 #!/bin/sh
 
-# Stack 1: Llama-Server (Granite-Tiny) auf Port 8080
 /opt/llama/llama-server \
   --model /data/models/granite-4.0-h-tiny-UD-Q4_K_XL.gguf \
-  --host 127.0.0.1 \
-  --port 8080 \
-  --ctx-size 8192 \
-  --threads 2 \
-  --jinja \
-  -ngl 0 &
+  --host 127.0.0.1 --port 8080 \
+  --ctx-size 8192 --threads 2 --jinja -ngl 0 &
 
-# Stack 1: cptr auf Port 7860
 cptr run --host 0.0.0.0 --port 7860 &
 
-# Stack 2: LA Agent Stack starten
 curl -sL "https://raw.githubusercontent.com/janhetzler/opencomputer/main/scripts/hfspace/start_hfspace.py" \
   -o /tmp/start_hfspace.py
 . /home/varxdev/la_env/bin/activate && \
@@ -82,7 +74,7 @@ python3 /tmp/start_hfspace.py &
 
 wait
 SH
-RUN chmod +x /usr/local/bin/start.sh
+RUN chmod +x /home/varxdev/start.sh
 
 EXPOSE 7860 8080 8090 8081 4000 6006 8002
-CMD ["/usr/local/bin/start.sh"]
+CMD ["/home/varxdev/start.sh"]
