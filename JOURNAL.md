@@ -7,6 +7,25 @@ Neuester Eintrag oben.
 
 ---
 
+## 2026-07-31 -- LA Stack auf HF Space: 2x 6/6 OK
+
+Stack 2 (LA mit Granite-350m) laeuft parallel zu Stack 1
+(cptr + Granite-Tiny) im selben Container. Zwei vollstaendige
+Testlaeufe erfolgreich abgeschlossen.
+
+**Commits heute:**
+- Dockerfile: Python 3.11 als Default (`1b6a57c`)
+- start_hfspace.py: mcp-server-git Pfad-Fix (`8fc7f4c`)
+- HFSPACE_TESTRESULTS.md: Ergebnisse dokumentiert (`75d7dd9`)
+
+**Testergebnisse:** siehe docs/HFSPACE_TESTRESULTS.md
+
+**Offen:**
+- inspect_phoenix.py HF-Space-kompatibel machen
+- Automatischen Stack-Start ins Dockerfile integrieren
+
+---
+
 ## 2026-07-31 -- HF Space Konzept erarbeitet
 
 Konzept fuer den Betrieb des LA Stacks auf einem HF Space Free Tier definiert.
