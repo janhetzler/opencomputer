@@ -7,6 +7,20 @@ Neuester Eintrag oben.
 
 ---
 
+## Offene Aenderungen (Todo)
+
+- **Dockerfile:** Granite-Tiny llama-server (:8080) ans Ende von start.sh
+  verschieben -- nach start_hfspace.py Aufruf, vor wait. Verhindert
+  RAM-Engpass beim Start (16GB real auf HF Space Free Tier).
+
+- **start_hfspace.py:** LiteLLM Timeout von 40 auf 90 Sekunden erhoehen.
+
+- **janhetzler/la requirements.txt:** async_timeout und prisma ergaenzen
+  (fehlen im Docker Build, wurden beim manuellen Test automatisch
+  als Abhaengigkeit von LiteLLM installiert).
+
+---
+
 ## 2026-07-31 -- Phoenix Tracing + Ein-Befehl-Skript
 
 - 4x 6/6 Testlaeufe bestaetigt
