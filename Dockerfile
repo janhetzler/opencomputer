@@ -71,7 +71,7 @@ while ! nc -z localhost 8090; do sleep 0.5; done
 
 while ! nc -z localhost 8081; do sleep 0.5; done
 
-# 3. start_hfspace.py uebernimmt LiteLLM, Phoenix, Agent Server, Tests
+# 3. start_hfspace.py -- LiteLLM, Phoenix, Agent Server (blockierend)
 . /home/varxdev/la_env/bin/activate
 curl -sL "https://raw.githubusercontent.com/janhetzler/opencomputer/main/scripts/hfspace/start_hfspace.py" \
   -o /tmp/start_hfspace.py
@@ -79,9 +79,10 @@ LA_REPO=/home/varxdev/la \
 MODEL_PATH=/data/models/granite-350m-Q4_K_M.gguf \
 EMBED_MODEL_PATH=/data/models/granite-embedding-30m-Q4_0.gguf \
 LLAMA_SERVER_BIN=/opt/llama/llama-server \
-python3 /tmp/start_hfspace.py &
+python3 /tmp/start_hfspace.py
 
-# 4. cptr parallel
+# 4. cptr -- warten bis Agent Server :8002 bereit
+while ! nc -z localhost 8002; do sleep 0.5; done
 cptr run --host 0.0.0.0 --port 7860 &
 
 # 5. Granite-Tiny zuletzt
