@@ -404,7 +404,3 @@ report_lines.append("\n```\n")
 trace_path.write_text("".join(report_lines), encoding="utf-8")
 print(f"Trace-Report: {trace_path}", flush=True)
 
-# Cleanup
-for proc in [litellm_proc, phoenix_proc, embed_proc]:
-    if proc: proc.terminate()
-print("\nStack gestoppt.", flush=True)
