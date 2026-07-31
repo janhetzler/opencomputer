@@ -31,6 +31,24 @@ der Stack manuell laeuft.
 
 ---
 
+
+## BUG-002: async_timeout fehlt in requirements.txt (LA)
+
+**Status:** Offen
+**Umgebung:** HF Space (la_env)
+
+**Symptom:** LiteLLM startet nicht -- ModuleNotFoundError: No module
+named 'async_timeout'. Das Paket fehlt in janhetzler/la requirements.txt.
+
+**Workaround:** Manuell installieren:
+. /home/varxdev/la_env/bin/activate && pip install async_timeout
+
+**Fix:** async_timeout in janhetzler/la requirements.txt ergaenzen.
+Zustaendig: Developer-Chat im LA Projekt.
+
+**Entdeckt:** 2026-07-31 im HF Space Deployment.
+
+---
 ## Geschlossene Bugs
 
 ---
