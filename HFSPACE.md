@@ -6,6 +6,64 @@ Neuester Eintrag oben.
 
 ---
 
+## 2026-07-31 -- Produktionsreifer Dockerfile-Plan
+
+### Was heute im Hottest validiert wurde
+
+4x 6/6 Agenten OK. Phoenix Tracing: 73 Spans ausgelesen.
+Ein Befehl, ein Terminal, vollautomatisch (start_hfspace.py c796f94).
+
+### Plan: Alles zur Build-Zeit
+
+Kein manueller Setup mehr nach Container-Start. Alles was moeglich
+ist kommt in die Build-Phase des Dockerfile.
+
+**Build-Zeit (RUN Bloecke -- einmalig beim Image-Build):**
+
+1. Python 3.11 als Default -- bereits drin
+2. LA Repo klonen nach /home/varxdev/la
+   (oeffentliches Repo -- kein Token noetig)
+3. virtualenv anlegen: /home/varxdev/la_env (Python 3.11)
+4. requirements.txt aus LA Repo ins venv installieren
+5. Granite-350m Q4_K_M herunterladen nach /data/models/
+   (oeffentliches GitHub Release -- kein Token noetig)
+6. Granite-Embedding-30m Q4_0 herunterladen nach /data/models/
+   (oeffentliches GitHub Release -- kein Token noetig)
+7. Verzeichnisse anlegen: /tmp/logs, /tmp/chroma_la, /tmp/traces
+
+**Laufzeit (start.sh -- bei jedem Container-Start):**
+
+1. Stack 1: llama-server :8080 (Granite-Tiny) starten
+2. Stack 1: cptr :7860 starten
+3. Stack 2: start_hfspace.py im Hintergrund starten
+   (venv aktivieren, LA_REPO=/home/varxdev/la)
+4. wait -- haelt beide Stacks am Leben
+
+**EXPOSE:**
+EXPOSE 7860 8080 8090 8081 4000 6006 8002
+
+### Umgebungsvariablen
+
+Alle haben sinnvolle Defaults -- kein manuelles Setzen noetig:
+
+| Variable | Default | Zweck |
+|----------|---------|-------|
+| LA_REPO | /home/varxdev/la | Pfad zum LA Repo |
+| LLAMA_SERVER_BIN | /opt/llama/llama-server | Binary-Pfad |
+| LLAMA_PORT | 8090 | LA llama-server Port |
+| EMBED_PORT | 8081 | Embedding-Server Port |
+| MODEL_PATH | /data/models/granite-350m-Q4_K_M.gguf | Reasoning-Modell |
+| EMBED_MODEL_PATH | /data/models/granite-embedding-30m-Q4_0.gguf | Embedding-Modell |
+
+Kein GH_TOKEN noetig -- alle Repos und Releases sind oeffentlich.
+
+### Noch offen (Phase 2)
+
+- CPTR_STARTUP_TOKEN: fester Token fuer cptr Login
+- Automatische cptr-Konfiguration via REST API (LA Agent Server verbinden)
+
+---
+
 ## 2026-07-31 -- Umgebungs-Check Ergebnisse
 
 ### Festgestellte Umgebung im HF Space Terminal
