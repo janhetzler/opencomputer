@@ -7,6 +7,13 @@ Neuester Eintrag oben.
 
 ---
 
+## 2026-07-31 -- HF Space Konzept erarbeitet
+
+Konzept fuer den Betrieb des LA Stacks auf einem HF Space Free Tier definiert.
+Details und Naechste Schritte: siehe [HFSPACE.md](HFSPACE.md)
+
+---
+
 ## 2026-07-24 -- Fork erstellt, Konzept definiert
 
 ### Kontext
