@@ -22,6 +22,10 @@ RUN mkdir -p /data/models && curl -L \
     "https://huggingface.co/unsloth/granite-4.0-h-tiny-GGUF/resolve/main/granite-4.0-h-tiny-UD-Q4_K_XL.gguf" \
     -o /data/models/granite-4.0-h-tiny-UD-Q4_K_XL.gguf
 
+# Benutzer anlegen -- VOR LA-Bloecken damit /home/varxdev existiert
+RUN useradd -m -u 1000 varxdev && \
+    mkdir -p /home/varxdev/workspace
+
 # LA Stack -- Repo klonen
 RUN git clone https://github.com/janhetzler/la /home/la_build
 
@@ -43,10 +47,8 @@ RUN curl -L \
 RUN cp -r /home/la_build /home/varxdev/la && \
     mkdir -p /tmp/logs /tmp/chroma_la /tmp/traces
 
-# Benutzer und Arbeitsverzeichnis einrichten
-RUN useradd -m -u 1000 varxdev && \
-    mkdir -p /home/varxdev/workspace && \
-    chown -R varxdev:varxdev /home/varxdev /data
+# Berechtigungen setzen -- nach allen Kopier-Operationen
+RUN chown -R varxdev:varxdev /home/varxdev /data /tmp/logs /tmp/chroma_la /tmp/traces
 
 # Start-Skript fuer cptr + Llama + LA Stack
 RUN cat > /usr/local/bin/start.sh <<'SH'
