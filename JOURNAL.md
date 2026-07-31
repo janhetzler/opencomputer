@@ -7,6 +7,21 @@ Neuester Eintrag oben.
 
 ---
 
+## 2026-07-31 -- 6/6 auch unter erschwerten Bedingungen
+
+Testlauf 21:36 UTC -- 6/6 OK trotz 20 Zombie-Prozessen und knappem RAM.
+19 Phoenix Spans. Alle Agenten stabil.
+
+Erkenntnisse des Tages:
+- Zombies entstehen weil cptr (PID 8) als Parent keine wait() aufruft
+- Loesung fuer Zukunft: tini als PID 1 im Dockerfile
+- LiteLLM Timeout-Problem: Granite-Tiny zuerst killen, dann LA Stack starten
+- prisma fehlt in LA requirements.txt -- Workaround: cptr installiert es mit
+- cptr Admin API vollstaendig dokumentiert (connections, users, config, tools)
+- cptr Login: POST /api/auth/login, user/12345678, Cookie in /tmp/cptr_cookies.txt
+
+---
+
 ## Offene Aenderungen (Todo)
 
 - **Dockerfile:** Granite-Tiny llama-server (:8080) ans Ende von start.sh
