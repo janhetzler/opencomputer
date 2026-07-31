@@ -6,6 +6,28 @@ Neuester Eintrag oben.
 
 ---
 
+## 2026-07-31 -- Umgebungs-Check Ergebnisse
+
+### Festgestellte Umgebung im HF Space Terminal
+
+- Python 3.10.12
+- pip 22.0.2 -- KEIN --break-system-packages (Option nicht vorhanden in pip 22)
+- Disk: 1.7T total, 328G frei (HF Space shared storage)
+- RAM: 123 GB angezeigt -- real 16 GB (bekannter HF Space Anzeigebug)
+- curl, git, wget vorhanden
+- llama-server b9895 bereits unter /opt/llama/llama-server
+- Bereits installiert: fastapi, httpx, uvicorn
+- Fehlen noch: langchain, chromadb, litellm, phoenix, arize-phoenix
+
+### Konsequenz fuer Installation
+
+pip install OHNE --break-system-packages verwenden:
+  pip3 install --quiet -r la/requirements.txt
+
+llama-server muss NICHT neu installiert werden -- bereits vorhanden.
+
+---
+
 ## 2026-07-31 -- Konzept definiert
 
 ### Umgebung
