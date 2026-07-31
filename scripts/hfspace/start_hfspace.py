@@ -186,7 +186,7 @@ litellm_proc = subprocess.Popen(
     env=os.environ.copy(),
     stdout=open(os.path.join(LOG_DIR, "litellm-la.log"), "w"), stderr=subprocess.STDOUT
 )
-wait_for("http://127.0.0.1:4000/health", "LiteLLM :4000",
+wait_for("http://127.0.0.1:4000/health", "LiteLLM :4000", retries=90,
          headers={"Authorization": f"Bearer {LITELLM_KEY}"})
 
 # LiteLLM Readiness-Check
