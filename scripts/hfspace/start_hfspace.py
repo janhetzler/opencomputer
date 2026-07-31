@@ -345,6 +345,65 @@ with open("/tmp/test_results_hfspace.json", "w") as f:
     json.dump(report, f, indent=2, ensure_ascii=False)
 print("\nReport: /tmp/test_results_hfspace.json", flush=True)
 
+# Phoenix Inspect -- laeuft waehrend Stack noch aktiv
+print("\n=== PHOENIX INSPECT ===", flush=True)
+from pathlib import Path
+from datetime import datetime, timedelta
+
+TRACE_DIR = Path("/tmp/traces")
+TRACE_DIR.mkdir(parents=True, exist_ok=True)
+
+print("Warte 5s auf Trace-Delivery...", flush=True)
+time.sleep(5)
+
+span_output = ""
+try:
+    from phoenix.client import Client
+    client = Client(base_url="http://127.0.0.1:6006")
+    spans_df = client.spans.get_spans_dataframe(
+        project_identifier="local-agent",
+        limit=100,
+        root_spans_only=True,
+        start_time=datetime.now() - timedelta(minutes=15)
+    )
+    if spans_df is not None and not spans_df.empty:
+        print(f"{len(spans_df)} Spans gefunden:", flush=True)
+        cols = [c for c in [
+            "name", "span_kind",
+            "attributes.llm.model_name",
+            "attributes.llm.token_count.prompt",
+            "attributes.llm.token_count.completion",
+            "status_code", "latency_ms"
+        ] if c in spans_df.columns]
+        for _, row in spans_df[cols].iterrows():
+            line = f"  {row.get('name','?')} | {row.get('status_code','?')} | {row.get('latency_ms','?')}ms"
+            print(line, flush=True)
+            span_output += line + "\n"
+    else:
+        print("Keine Spans gefunden.", flush=True)
+        span_output = "Keine Spans gefunden."
+except Exception as e:
+    print(f"Phoenix Client Fehler: {e}", flush=True)
+    span_output = f"Fehler: {e}"
+
+# Trace-Report speichern
+date_str = datetime.now().strftime("%Y-%m-%d_%H-%M")
+trace_path = TRACE_DIR / f"hfspace_{date_str}.md"
+ok_count = sum(1 for r in results if r["status"] == "OK")
+report_lines = [f"# HF Space Trace Report -- {date_str}\n\n"]
+report_lines.append(f"**Tests:** {ok_count}/{len(results)} OK\n\n")
+report_lines.append("## Testergebnisse\n\n")
+for r in results:
+    report_lines.append(
+        f"- {'OK' if r['status'] == 'OK' else 'FAIL'} **{r['agent']}**: "
+        f"{r['reason']} | {r['zeit']}s | HTTP {r['http']}\n"
+    )
+report_lines.append("\n## Phoenix Spans\n\n```\n")
+report_lines.append(span_output)
+report_lines.append("\n```\n")
+trace_path.write_text("".join(report_lines), encoding="utf-8")
+print(f"Trace-Report: {trace_path}", flush=True)
+
 # Cleanup
 for proc in [litellm_proc, phoenix_proc, embed_proc]:
     if proc: proc.terminate()
