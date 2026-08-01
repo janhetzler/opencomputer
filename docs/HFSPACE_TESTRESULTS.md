@@ -1,71 +1,35 @@
-# HFSPACE_TESTRESULTS.md -- HF Space Testergebnisse
+## 2026-08-01 09:32-09:33 UTC -- 6/6 OK, manueller Testlauf
 
-## 2026-07-31 -- Erster vollstaendiger Testlauf
+**Umgebung:** HF Space, Dockerfile Commit 70d995b6 (tini, netcat, neue Startreihenfolge)
+**Gestartet:** manuell im cptr-Terminal (`python3 /tmp/start_hfspace.py`)
+**Dauer:** ~85 Sekunden (Start bis Testergebnis)
 
-### Kontext
+### Testergebnisse
 
-Erster erfolgreicher LA Stack Testlauf auf HF Space Free Tier.
-Stack 2 (LA) laeuft parallel zu Stack 1 (cptr + Granite-Tiny).
+| Agent | Status | Zeit | Anmerkung |
+|-------|--------|------|-----------|
+| Supervisor Routing | OK | - | language=English -> meta |
+| Comms Agent | OK | 21.3s | 845 Zeichen |
+| Code Agent | OK | 6.9s | 293 Zeichen (heuristic -> comms, aber Antwort korrekt) |
+| Researcher Agent | OK | 28.3s | 42 Zeichen (max Tool-Runden erreicht) |
+| Notes Agent | OK | 12.0s | save_note OK, ChromaDB cosine |
+| Handoff Agent | OK | 6.2s | 713 Zeichen |
 
-### Commits
+**Tests: 6/6 OK**
 
-- start_hfspace.py: `8fc7f4c` (mcp-server-git Pfad-Bug Fix)
-- Dockerfile: Python 3.11 als Default (`1b6a57c`)
+### Phoenix Spans
 
-### Stack-Konfiguration
+19 Spans erfasst (alle OK):
+- 9x ChatOpenAI
+- 5x search_local_documents
+- 1x save_note
 
-| Komponente       | Port | Details                                      |
-|------------------|------|----------------------------------------------|
-| llama-server     | 8090 | Granite-350m Q4_K_M, /opt/llama/llama-server |
-| Embedding-Server | 8081 | Granite-Embedding-30m Q4_0                   |
-| LiteLLM          | 4000 | Proxy auf Port 8090                          |
-| Phoenix          | 6006 | Tracing aktiv                                |
-| Agent Server     | 8002 | FastAPI, alle 6 Agenten geladen              |
+### Auffaelligkeiten
 
-- venv: `/home/varxdev/la_env` (Python 3.11.0rc1)
-- LA Repo: `/home/varxdev/la`
-- mcp.json: laufzeit-generiert nach `/tmp/mcp_hfspace.json`
-
-### Testergebnisse -- Testlauf 1 (2026-07-31T16:48:18)
-
-| Agent             | Status | Antwortlaenge | Zeit   | HTTP |
-|-------------------|--------|---------------|--------|------|
-| Supervisor Routing| OK     | 65 Zeichen    | 7.6s   | 200  |
-| Comms Agent       | OK     | 560 Zeichen   | 13.6s  | 200  |
-| Code Agent        | OK     | 293 Zeichen   | 6.9s   | 200  |
-| Researcher Agent  | OK     | 83 Zeichen    | 1.2s   | 200  |
-| Notes Agent       | OK     | 58 Zeichen    | 15.2s  | 200  |
-| Handoff Agent     | OK     | 702 Zeichen   | 7.8s   | 200  |
-
-**Gesamt: 6/6 OK**
-
-### Testergebnisse -- Testlauf 2 (2026-07-31T17:48:01) nach mcp-Bug Fix
-
-| Agent             | Status | Antwortlaenge | Zeit   | HTTP |
-|-------------------|--------|---------------|--------|------|
-| Supervisor Routing| OK     | 65 Zeichen    | 7.6s   | 200  |
-| Comms Agent       | OK     | 478 Zeichen   | 10.6s  | 200  |
-| Code Agent        | OK     | --            | 3.8s   | 200  |
-| Researcher Agent  | OK     | 42 Zeichen    | 27.4s  | 200  |
-| Notes Agent       | OK     | 58 Zeichen    | 15.1s  | 200  |
-| Handoff Agent     | OK     | 652 Zeichen   | 6.6s   | 200  |
-
-**Gesamt: 6/6 OK**
-
-### Bekannte Einschraenkungen
-
-- inspect_phoenix.py nicht HF-Space-kompatibel: sucht
-  `/tmp/llama-b9895/llama-server` (Sandbox-Pfad) -- wird uebersprungen
-- Researcher Agent: mcp-server-git wirft intern Fehler aber Antwort
-  kommt trotzdem (ExceptionGroup wird abgefangen)
-- 350m Modell: Routing-Limitierung bekannt, heuristic layer uebernimmt
-
-### Naechste Schritte
-
-- inspect_phoenix.py fuer HF Space anpassen (LLAMA_SERVER_BIN ENV)
-- Automatischen Stack-Start ins Dockerfile integrieren
-- CPTR_STARTUP_TOKEN im Dockerfile setzen
-
+- Phoenix :6006 TIMEOUT beim Start (40 Retries) -- aber Tracing funktioniert trotzdem
+- Port-Check zeigt doppelte FAIL/OK Zeilen (cosmetic bug im Pre-Flight)
+- Code Agent: heuristic routing -> comms statt code, Antwort aber korrekt
+- Researcher: max Tool-Runden (5x search_local_documents, dann Abbruch)
 
 ---
 
