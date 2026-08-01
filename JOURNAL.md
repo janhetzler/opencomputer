@@ -5,6 +5,21 @@ Zweck: GUI + API Gateway fuer den Local Agent Stack (la)
 
 Neuester Eintrag oben.
 
+## 2026-08-01 -- Aktueller Dockerfile-Stand (Testversion)
+
+start.sh laeuft mit cptr + beiden llama-servern (:8090, :8081).
+start_hfspace.py (LA Stack) ist auskommentiert -- cptr startet
+ohne Warteloop auf Port 8002.
+
+```sh
+# Auskommentiert (noch nicht aktiv):
+# python3 /tmp/start_hfspace.py
+# while ! nc -z localhost 8002; do sleep 0.5; done
+```
+
+Naechster Schritt (noch offen): Einkommentieren wenn LA Stack
+automatisch beim Docker-Start hochkommen soll.
+
 ---
 
 ## 2026-08-01 -- 6/6 auf neuem Dockerfile bestaetigt
