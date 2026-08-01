@@ -7,6 +7,27 @@ Neuester Eintrag oben.
 
 ---
 
+## 2026-08-01 -- 6/6 auf neuem Dockerfile bestaetigt
+
+Manueller Testlauf 09:32-09:33 UTC -- 6/6 OK.
+Neues Dockerfile: tini als PID 1, netcat Readiness-Checks,
+korrekte Startreihenfolge (350m zuerst, Granite-Tiny zuletzt).
+19 Phoenix Spans erfasst.
+
+### Offene Untersuchung
+
+- **Port-Routing im HF Space:** Subdomain-Schema
+  `https://janhetzler-mytest2-6006.hf.space` funktioniert nicht
+  fuer interne Ports (Phoenix :6006, LiteLLM :4000 etc.).
+  `/proxy/PORT/` Schema funktioniert nur fuer VS Code / Jupyter.
+  Muss untersucht werden wie interne Ports von aussen erreichbar
+  gemacht werden koennen.
+
+### Naechster Schritt
+
+- start_hfspace.py in start.sh einkommentieren + ENV-Variablen
+  exportieren fuer vollautomatischen Start beim Container-Start.
+
 ## 2026-07-31 -- 6/6 auch unter erschwerten Bedingungen
 
 Testlauf 21:36 UTC -- 6/6 OK trotz 20 Zombie-Prozessen und knappem RAM.
