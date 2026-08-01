@@ -405,4 +405,3 @@ trace_path.write_text("".join(report_lines), encoding="utf-8")
 print(f"Trace-Report: {trace_path}", flush=True)
 
 print("Stack laeuft.", flush=True)
-litellm_proc.wait()
