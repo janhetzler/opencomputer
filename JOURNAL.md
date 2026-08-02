@@ -5,6 +5,42 @@ Zweck: GUI + API Gateway fuer den Local Agent Stack (la)
 
 Neuester Eintrag oben.
 
+## 2026-08-01 -- HF Space Stack live, Researcher/Code Agent 500er
+
+### Erledigte Aenderungen
+
+- Dockerfile (70d995b6): start.sh Reihenfolge -- cptr erst nach nc -z 8002,
+  Granite-Tiny zuletzt
+- start_hfspace.py: Cleanup-Block entfernt, litellm_proc.wait() ergaenzt --
+  Stack bleibt nach Testlauf am Leben
+- Modellwechsel erfolgreich getestet: LA Stack auf Granite-Tiny :8080 umgebogen
+  (Config-Aenderung in /tmp/litellm_hfspace.yaml, kein Neustart noetig)
+
+### Stack-Status
+
+cptr (v0.9.20) laeuft auf :7860, agent-local Verbindung konfiguriert
+(http://127.0.0.1:4000/v1). Basisanfragen funktionieren.
+
+### Offene Bugs
+
+**Researcher + Code Agent werfen 500er** bei bestimmten Anfragen:
+- `ExceptionGroup: unhandled errors in a TaskGroup` im Agent Server Log
+- LiteLLM sieht Internal Server Error von :8002, retried 2x, gibt auf
+- Tritt mit Granite-Tiny genauso auf wie mit 350m -- kein Modellproblem
+- Phoenix und Inspect wurden beim Debugging nicht eingesetzt -- Fehlerursache
+  noch unbekannt
+- Dokumentiert als BUG-027 in janhetzler/la
+
+### Erkenntnisse
+
+- Testlauf (6/6 OK) war strukturell falsch -- "Maximale Tool-Runden erreicht"
+  wurde als OK gewertet. Researcher hat nie wirklich funktioniert.
+- Phoenix Tracing und Inspect muessen beim naechsten Debugging-Anlauf
+  systematisch eingesetzt werden statt schrittweiser Log-Analyse
+- Testlauf muss ueberarbeitet werden (BUG-027)
+
+---
+
 ## 2026-08-01 -- Aktueller Dockerfile-Stand (Testversion)
 
 start.sh laeuft mit cptr + beiden llama-servern (:8090, :8081).
