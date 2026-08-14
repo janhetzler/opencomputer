@@ -4,7 +4,7 @@ type: Reference
 status: current
 updated_at: 2026-08-14
 stale_after: 2027-08-14
-tags: [cptr, admin, config, api, rest]
+tags: [cptr, admin, config, api, rest, sqlite]
 ---
 
 # cptr Admin Config API: Konfigurierbare Settings
@@ -13,7 +13,7 @@ Alle Settings werden über `PUT /api/admin/config` gesetzt und über
 `GET /api/admin/config` ausgelesen. Werte sind JSON. Keys verwenden
 Dot-Notation.
 
-Verwandte Dokumentation: [HFSPACE.md](../HFSPACE.md)
+Verwandte Dokumentation: [HFSPACE.md](../HFSPACE.md) · [OPERATIONS_HFSPACE.md](OPERATIONS_HFSPACE.md)
 
 ---
 
@@ -51,7 +51,7 @@ def set_config(updates: dict):
 
 ---
 
-## Alle konfigurierbaren Keys
+## Alle konfigurierbaren Keys (Config-API)
 
 ### agents
 | Key | Typ | Beschreibung |
@@ -182,8 +182,94 @@ def set_config(updates: dict):
 
 ---
 
+## Logging -- Umgebungsvariablen (nicht Config-API)
+
+Logging wird ausschliesslich über Umgebungsvariablen konfiguriert,
+nicht über die Admin-Config-API. Diese müssen vor dem cptr-Start
+gesetzt werden (z.B. in start.sh).
+
+| Variable | Default | Beschreibung |
+|----------|---------|--------------|
+| `CPTR_LOG_LEVEL` | `INFO` | Log-Level: DEBUG, INFO, WARNING, ERROR |
+| `CPTR_LOG_FORMAT` | `text` | Format: `text` oder `json` |
+| `CPTR_AUDIT_LOG_LEVEL` | `NONE` | Audit-Level: `NONE`, `METADATA`, `REQUEST`, `REQUEST_RESPONSE` |
+| `CPTR_AUDIT_LOG_PATH` | `~/.cptr/logs/audit.jsonl` | Pfad zur Audit-Log-Datei |
+| `CPTR_AUDIT_LOG_ROTATION` | `10 MB` | Rotation bei Dateigrösse |
+| `CPTR_AUDIT_MAX_BODY_SIZE` | `2048` | Max. Body-Grösse im Log (Bytes) |
+| `CPTR_AUDIT_EXCLUDED_PATHS` | `/api/chats,/v1/chat` | Pfade die nicht geloggt werden |
+| `CPTR_LOG_UPSTREAM_REQUESTS` | `false` | Upstream-Requests (an Modell) loggen |
+| `CPTR_UPSTREAM_REQUEST_LOG_PATH` | `~/.cptr/logs/upstream-requests.jsonl` | Pfad dazu |
+| `CPTR_UPSTREAM_REQUEST_LOG_ROTATION` | `50 MB` | Rotation dazu |
+
+### Audit-Logging aktivieren (in start.sh)
+
+```sh
+CPTR_AUDIT_LOG_LEVEL=METADATA cptr run --host 0.0.0.0 --port 7860
+```
+
+Audit-Level Bedeutung:
+- `NONE` -- kein Logging (Default)
+- `METADATA` -- Method, Path, Status, User, IP
+- `REQUEST` -- + Request Body (sensitive Felder werden redaktiert)
+- `REQUEST_RESPONSE` -- + Response Body
+
+---
+
+## SQLite Datenbank -- Schema
+
+Pfad: `/home/varxdev/.cptr/app.db` (WAL-Modus)
+Zusatzdateien: `app.db-shm`, `app.db-wal` (WAL-Dateien, immer zusammen lesen)
+
+### Tabellen
+
+| Tabelle | Inhalt |
+|---------|--------|
+| `users` | User-Profil: id, display_name, profile_image_url, role, settings, created_at, updated_at, last_seen_at |
+| `auths` | Login-Daten: user_id, username, password (bcrypt) |
+| `user_states` | UI-Zustand pro User: theme, keybindings, workspaceOrder, toolApprovalMode, locale, homeState |
+| `config` | App-Config: key, value (JSON), updated_at |
+| `files` | Hochgeladene Dateien: id, user_id, filename, path, hash, meta, data, created_at, updated_at |
+| `chats` | Chat-Metadaten: id, user_id, title, summary, current_message_id, meta, created_at, updated_at, last_read_at |
+| `chat_messages` | Nachrichten: id, chat_id, parent_id, role, content, model, done, output, usage, meta, created_at, chat_summary |
+| `workspaces` | Workspace-Zustand: id, user_id, path, name, data, created_at, updated_at |
+| `automations` | Scheduled Tasks: id, user_id, name, prompt, model_id, workspace, rrule, is_active, last_run_at, next_run_at, meta, created_at, updated_at |
+| `automation_runs` | Task-Läufe: id, automation_id, chat_id, status, error, created_at |
+
+### user_states -- UI-Settings (nicht über Config-API)
+
+Theme, Keybindings und UI-Zustand liegen in `user_states.data` (JSON).
+Diese sind **nicht** über die Admin-Config-API erreichbar, sondern nur
+direkt in der DB oder über die cptr-UI.
+
+Bekannte Felder in `data`:
+- `theme` -- `light` oder `dark`
+- `appearance.theme`, `appearance.themeConfig`, `appearance.textScale`, `appearance.borderContrast`
+- `locale` -- z.B. `de-DE`
+- `toolApprovalMode` -- `auto`, `ask`, `full`
+- `sidebarOpen`, `sidebarWidth`
+- `widescreenMode`, `expandToolDetails`
+- `workspaceOrder` -- Liste der Workspace-Pfade
+- `keybindings` -- alle Tastenkürzel
+- `version` -- cptr-Version beim letzten Login
+
+DB-Abfrage (read-only, WAL-sicher):
+
+```python
+import sqlite3, json
+conn = sqlite3.connect("/home/varxdev/.cptr/app.db")
+conn.execute("PRAGMA wal_checkpoint(PASSIVE)")
+rows = conn.execute("SELECT user_id, data FROM user_states").fetchall()
+for user_id, data in rows:
+    print(user_id, json.loads(data) if isinstance(data, str) else data)
+conn.close()
+```
+
+---
+
 ## Hinweis
 
 Theme- und UI-Einstellungen (Farben, Schrift) sind nicht über die
-Config-API konfigurierbar — diese sind clientseitig im CSS/Svelte
-Frontend hardcoded.
+Config-API konfigurierbar -- diese liegen in `user_states` in der
+SQLite-Datenbank und werden über die cptr-UI gesetzt.
+
+Skript zum vollständigen DB-Export: [scripts/hfspace/cptr_db_export.py](../scripts/hfspace/cptr_db_export.py)
