@@ -1,3 +1,35 @@
+## BUG-007: PIDs manuell gestarteter Prozesse schwer auffindbar
+
+**Status:** Offen
+**Umgebung:** HF Space Terminal
+
+**Symptom:** Im cptr-Terminal gestartete Prozesse (llama-server, LiteLLM,
+Agent Server etc.) sind spaeter schwer zu killen. `ps aux` zeigt viele
+Prozesse aber ohne notierte PID ist der richtige schwer zu identifizieren.
+
+**Ursache:** cptr verwendet `os.fork()` fuer Terminal-Sessions
+(cptr/utils/terminal.py). Alle im Terminal gestarteten Prozesse sind
+direkte Kind- bzw. Enkelprozesse von cptr -- die PPID-Kette macht
+gezieltes `kill` ohne bekannte PID schwierig.
+
+**Workaround:** PID nach jedem manuellen Start sofort notieren:
+
+```bash
+nohup python3 /tmp/start_hfspace.py > /tmp/logs/la_start.log 2>&1 &
+echo $! > /tmp/la_stack.pid
+cat /tmp/la_stack.pid
+```
+
+Oder PID-Datei pro Prozess ablegen und fuer kill verwenden:
+
+```bash
+kill $(cat /tmp/la_stack.pid)
+```
+
+**Fix:** PID-Dateien in start_hfspace.py automatisch schreiben.
+
+---
+
 ---
 type: Log
 status: current
