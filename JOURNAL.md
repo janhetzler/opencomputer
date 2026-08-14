@@ -1,3 +1,44 @@
+## 2026-08-14 -- cptr als Frontend verifiziert, Granite-Tiny aktiv
+
+### Ergebnis
+
+cptr laeuft als vollstaendiges Frontend fuer den LA Agent Stack.
+Modell gewechselt von Granite-350m (:8090) auf Granite-Tiny (:8080) --
+deutlich bessere Qualitaet bei Tool-Calling und Antworten.
+
+### Testergebnisse mit Granite-Tiny (4B)
+
+| Test | Ergebnis |
+|------|---------|
+| Supervisor "Hi, what can you do?" | OK -- vollstaendige strukturierte Antwort |
+| Notes Agent "Save this note: ..." | OK -- "The note has been saved successfully" |
+| ChromaDB Verifikation | OK -- Eintrag korrekt gespeichert |
+| Comms Agent Statusmail | OK -- vollstaendige Email generiert |
+| Researcher "Was steht in ROADMAP?" | FAIL -- sucht in ChromaDB statt Git (bekannt) |
+
+### Vergleich 350m vs Granite-Tiny
+
+| Funktion | 350m | Granite-Tiny |
+|----------|------|-------------|
+| Supervisor Routing | "Hello!" | Vollstaendige Uebersicht aller Agenten |
+| Notes speichern | "Maximale Tool-Runden" | "Saved successfully" |
+| ChromaDB Inhalt | Nur Dateiname | Vollstaendiger Text |
+| Comms Email | Einfach | Strukturiert mit Bullet Points |
+
+### LiteLLM Config Aenderung
+
+granite-tiny api_base von :8090 auf :8080 umgestellt.
+Neustart via pkill -f (nicht PID) -- heute gelernt und bewaehrt.
+
+### Offene Punkte
+
+- Researcher muss prompts/agents/researcher.md angepasst werden
+  damit er mcp_git fuer Repo-Inhalte nutzt statt ChromaDB
+- Dockerfile anpassen fuer automatischen Stack-Start
+- la_stack.sh ins la Repo pushen (aktuell nur in opencomputer)
+
+---
+
 ## 2026-08-14 -- LA Stack live, cptr als Frontend konfiguriert
 
 ### Erledigte Aenderungen
