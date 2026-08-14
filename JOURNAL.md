@@ -1,3 +1,51 @@
+## 2026-08-14 -- LA Stack live, cptr als Frontend konfiguriert
+
+### Erledigte Aenderungen
+
+- LA Stack manuell hochgezogen (Phoenix, LiteLLM, Agent Server)
+- PIDs gesichert unter /tmp/pids/ (phoenix.pid, litellm.pid, agent-server.pid)
+- Logs unter /tmp/logs/ (phoenix.log, litellm.log, agent-server.log)
+- cptr Connection auf LiteLLM :4000 umgebogen (war: Granite-Tiny :8080)
+- MCP Server in cptr konfiguriert: mcp_git, mcp_fetch (mcp_stdio, la_env Python)
+- mcp_git verifiziert: 12 Tools gefunden, Verbindung OK
+- cptr_db_export.py ins Repo gepusht (scripts/hfspace/)
+- CPTR_CONFIG_API.md vollstaendig (Config-Keys, DB-Schema, Logging ENV, Laufzeit)
+
+### Stack-Status
+
+Alle Komponenten laufen:
+
+| Komponente | Port | PID-Datei |
+|------------|------|-----------|
+| llama-server (Granite-Tiny) | 8080 | via start.sh |
+| llama-server (350m) | 8090 | via start.sh |
+| Embedding-Server | 8081 | via start.sh |
+| Phoenix | 6006 | /tmp/pids/phoenix.pid |
+| LiteLLM | 4000 | /tmp/pids/litellm.pid |
+| Agent Server | 8002 | /tmp/pids/agent-server.pid |
+| cptr | 7860 | via start.sh |
+
+cptr Frontend: verbunden mit LiteLLM :4000 (agent-local Modell)
+MCP Tools: mcp_git (12 Tools), mcp_fetch -- beide aktiv in cptr
+
+### Erkenntnisse
+
+- PIDs IMMER sofort sichern -- alle Prozesse sind Kindprozesse von cptr (os.fork)
+  Ohne PID-Datei ist gezieltes Kill sehr schwer (BUG-007)
+- /tmp/pids/ und /tmp/logs/ muessen VOR dem Start angelegt werden
+- MCP Server laufen als mcp_stdio -- werden von cptr bei Bedarf gestartet
+  Python-Pfad muss absolut sein: /home/varxdev/la_env/bin/python3
+- Phoenix healthz endpoint: /healthz (nicht /health)
+- LiteLLM braucht ~15s zum Hochfahren -- nicht zu frueh testen
+
+### Offene Punkte
+
+- cptr Connection umbiegen noch nicht ausgefuehrt (Script bereit)
+- Dockerfile anpassen sobald alles live verifiziert ist
+- Gesamtes Start-Prozedere als Script ablegen
+
+---
+
 # JOURNAL.md -- Entwicklungstagebuch opencomputer
 
 Fork von: open-webui/computer
