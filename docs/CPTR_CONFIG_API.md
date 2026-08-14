@@ -273,3 +273,38 @@ Config-API konfigurierbar -- diese liegen in `user_states` in der
 SQLite-Datenbank und werden über die cptr-UI gesetzt.
 
 Skript zum vollständigen DB-Export: [scripts/hfspace/cptr_db_export.py](../scripts/hfspace/cptr_db_export.py)
+---
+
+## Laufzeit & Ressourcen
+
+### Installation
+
+| Was | Wo | Wie |
+|-----|----|-----|
+| cptr Binary + Pakete | systemweit (Python) | `pip install cptr[all]` |
+| cptr Daten (DB, Config, Logs) | `/home/varxdev/.cptr/` | automatisch beim ersten Start |
+| cptr Start | `/home/varxdev/start.sh` | via tini als PID 1 |
+
+### RAM-Verbrauch (gemessen, HF Space)
+
+| Prozess | RSS |
+|---------|-----|
+| cptr (:7860, Python) | ~98 MB |
+
+### Prozess-Hierarchie
+
+cptr laeuft als direkter Kind-Prozess von tini (PID 1).
+Alle Terminal-Sessions sind Kindprozesse von cptr (`os.fork()`).
+Alle im Terminal gestarteten Prozesse sind damit Enkelprozesse von cptr.
+Siehe BUG-007 fuer Konsequenzen beim Killen von Prozessen.
+
+### Datei-Locations
+
+| Datei | Pfad |
+|-------|------|
+| SQLite DB | `/home/varxdev/.cptr/app.db` |
+| WAL Dateien | `/home/varxdev/.cptr/app.db-shm`, `app.db-wal` |
+| Config Mirror | `/home/varxdev/.cptr/config.toml` |
+| Audit Log (wenn aktiv) | `/home/varxdev/.cptr/logs/audit.jsonl` |
+| Upstream Log (wenn aktiv) | `/home/varxdev/.cptr/logs/upstream-requests.jsonl` |
+
