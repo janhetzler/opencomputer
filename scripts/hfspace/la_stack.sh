@@ -15,7 +15,7 @@
 
 LA_REPO=/home/varxdev/la
 LITELLM_KEY=sk-cos-local-dev
-LLAMA_PORT=8090
+LLAMA_PORT=8080
 EMBED_PORT=8081
 
 # ── Hilfsfunktionen ────────────────────────────────────────
