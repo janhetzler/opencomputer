@@ -1,3 +1,29 @@
+## BUG-008: mcp-server-fetch schlägt fehl -- Node.js zu alt
+
+**Status:** Offen
+**Umgebung:** HF Space Docker Container
+
+**Symptom:** mcp-server-fetch wirft beim Fetch-Tool-Call:
+`Command ExtractArticle.js returned non-zero exit status 1`
+LiteLLM meldet daraufhin InternalServerError fuer agent-local.
+
+**Ursache:** readabilipy (Abhaengigkeit von mcp-server-fetch) benoetigt
+Node.js 18+ fuer ExtractArticle.js. Im Container laeuft Node v12.22.9
+(Ubuntu 22.04 Default) -- zu alt.
+
+**Auswirkung:** Researcher Agent kann keine Web-Inhalte fetchen.
+Python-HTML-Fallback liefert schlechte Qualitaet bei JS-heavy Sites.
+
+**Fix:** Node.js 20 ins Dockerfile:
+
+```dockerfile
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x \
+    | bash - && \
+    apt-get install -y nodejs
+```
+
+---
+
 ## BUG-007: PIDs manuell gestarteter Prozesse schwer auffindbar
 
 **Status:** Offen
