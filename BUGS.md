@@ -1,3 +1,25 @@
+## BUG-010: Phoenix Tracing -- init_phoenix() wird in server.py nicht aufgerufen
+
+**Status:** Offen
+**Repo:** janhetzler/la (agents/server/server.py)
+
+**Symptom:** Keine Spans in Phoenix obwohl Agent Server laeuft,
+OTEL ENV-Variablen gesetzt sind und gRPC :4317 erreichbar ist.
+
+**Ursache:** server.py importiert telemetry.py nicht und ruft
+init_phoenix() nicht auf. LangChainInstrumentor wird nie registriert.
+
+**Fix:** In agents/server/server.py ergaenzen:
+
+```python
+from telemetry import init_phoenix
+init_phoenix()
+```
+
+(Developer-Chat Aufgabe -- janhetzler/la)
+
+---
+
 ## BUG-009: mcp_git -- Agenten uebergeben GitHub-URL statt lokalem Pfad
 
 **Status:** Offen
