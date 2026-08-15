@@ -1,3 +1,36 @@
+## 2026-08-14 -- Node 20 live installiert, Researcher Web-Fetch funktioniert
+
+### Problem
+
+mcp-server-fetch schlug fehl weil readabilipy Node 18+ benoetigt.
+Ubuntu 22.04 Docker Container hat nur Node v12.22.9 (zu alt).
+sudo nicht verfuegbar (Container laeuft als varxdev).
+
+### Loesung
+
+Node 20.19.0 via nodeenv ohne Root-Rechte installiert:
+
+```sh
+nodeenv --node=20.19.0 /tmp/node20
+export PATH=/tmp/node20/bin:$PATH
+```
+
+Agent Server mit erweitertem PATH neu gestartet -- mcp-server-fetch
+kann nun ExtractArticle.js korrekt ausfuehren.
+
+### Testergebnis
+
+"Was ist LangGraph? Suche im Web." -- Researcher liefert vollstaendige,
+strukturierte Antwort mit Web-Inhalten. Fetch-Tool funktioniert.
+
+### Offen
+
+Node 20 unter /tmp/node20 -- nicht persistent (Container-Neustart).
+Fix: Node 20 ins Dockerfile (BUG-008).
+Script: scripts/hfspace/install_node20.sh
+
+---
+
 ## 2026-08-14 -- cptr als Frontend verifiziert, Granite-Tiny aktiv
 
 ### Ergebnis
