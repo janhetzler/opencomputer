@@ -182,6 +182,10 @@ EOF
     MCP_CONFIG_PATH=/tmp/mcp_hfspace.json \
     OPENAI_API_KEY=${LITELLM_KEY} \
     PYTHONPATH=${LA_REPO}/agents/server \
+    OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4317 \
+    OTEL_SERVICE_NAME=la-agent-server \
+    PHOENIX_COLLECTOR_ENDPOINT=http://127.0.0.1:6006/v1/traces \
+    PATH=/tmp/node20/bin:${PATH} \
     nohup uvicorn server:app \
       --host 127.0.0.1 \
       --port 8002 \
