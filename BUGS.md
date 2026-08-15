@@ -1,3 +1,24 @@
+## BUG-009: mcp_git -- Agenten uebergeben GitHub-URL statt lokalem Pfad
+
+**Status:** Offen
+**Repo:** janhetzler/la (agents/prompts)
+
+**Symptom:** Code Agent ruft mcp_git mit `repo_path=/github.com/janhetzler/la`
+auf statt `/home/varxdev/la`. mcp_git verweigert Zugriff:
+"Repository path is outside the allowed repository /home/varxdev/la"
+
+**Ursache:** Agenten-Prompt definiert nicht explizit welcher lokale
+Repo-Pfad zu verwenden ist. Modell leitet GitHub-URL aus Kontext ab.
+
+**Workaround:** Im Chat explizit angeben:
+"git status von /home/varxdev/la"
+
+**Fix:** prompts/agents/code.md und prompts/agents/researcher.md
+erwaeitern um: "Lokaler Repo-Pfad ist immer /home/varxdev/la"
+(Developer-Chat Aufgabe)
+
+---
+
 ## BUG-008: mcp-server-fetch schlägt fehl -- Node.js zu alt
 
 **Status:** Offen
