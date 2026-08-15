@@ -179,16 +179,26 @@ EOF
 }
 EOF
     cd ${LA_REPO}
-    MCP_CONFIG_PATH=/tmp/mcp_hfspace.json \
-    OPENAI_API_KEY=${LITELLM_KEY} \
-    PYTHONPATH=${LA_REPO}/agents/server \
-    OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4317 \
-    OTEL_SERVICE_NAME=la-agent-server \
-    PHOENIX_COLLECTOR_ENDPOINT=http://127.0.0.1:6006/v1/traces \
+    cat > /tmp/start_agent_server.py << 'PYEOF'
+import sys, os
+sys.path.insert(0, "/home/varxdev/la/agents/server")
+os.environ["MCP_CONFIG_PATH"]              = "/tmp/mcp_hfspace.json"
+os.environ["OPENAI_API_KEY"]              = "sk-cos-local-dev"
+os.environ["PHOENIX_COLLECTOR_ENDPOINT"]  = "http://127.0.0.1:6006/v1/traces"
+os.environ["PHOENIX_CLIENT_HEADERS"]      = "api_key=not-needed"
+try:
+    from telemetry import init_phoenix
+    init_phoenix()
+    print("Phoenix Tracing aktiv", flush=True)
+except Exception as e:
+    print(f"Phoenix Tracing: {e}", flush=True)
+import uvicorn
+import server as agent_server
+uvicorn.run(agent_server.app, host="127.0.0.1", port=8002, log_level="error")
+PYEOF
     PATH=/tmp/node20/bin:${PATH} \
-    nohup uvicorn server:app \
-      --host 127.0.0.1 \
-      --port 8002 \
+    PYTHONPATH=${LA_REPO}/agents/server \
+    nohup python3 /tmp/start_agent_server.py \
       > /tmp/logs/agent-server.log 2>&1 &
     sleep 2
     pgrep -f "uvicorn server:app" \
