@@ -1,3 +1,42 @@
+## 2026-08-14 -- Phoenix Tracing funktioniert, 10 Spans verifiziert
+
+### Problem und Loesung
+
+Phoenix Tracing hat nicht funktioniert weil:
+1. la_stack.sh startete Agent Server via `uvicorn server:app` -- separater Prozess
+2. init_phoenix() wurde nie aufgerufen
+3. Spans gingen ins falsche Projekt -- "default" statt "local-agent"
+
+Loesung: la_stack.sh startet Agent Server jetzt via /tmp/start_agent_server.py
+welches init_phoenix() aufruft bevor uvicorn startet -- exakt wie start_hfspace.py.
+
+### Verifiziert
+
+Nach git-status Call in cptr:
+
+```
+Spans: 10
+model     | OK    | CHAIN
+ChatOpenAI| OK    | LLM
+ChatOpenAI| OK    | LLM
+LangGraph | ERROR | CHAIN
+tools     | ERROR | CHAIN
+```
+
+Phoenix Projekt: local-agent (ID: UHJvamVjdDoy) -- nicht "default"
+
+### Fixes heute in la_stack.sh
+
+1. LLAMA_PORT: 8090 -> 8080 (Granite-Tiny)
+2. Agent Server Start: uvicorn -> start_agent_server.py mit init_phoenix()
+3. Phoenix ENV-Variablen korrekt gesetzt
+
+### Skript
+
+scripts/hfspace/phoenix_inspect.py -- Traces auslesen mit --limit und --errors-only
+
+---
+
 ## 2026-08-14 -- Node 20 live installiert, Researcher Web-Fetch funktioniert
 
 ### Problem
